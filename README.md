@@ -16,6 +16,7 @@ The goal of this project is to determine the impact of feeding patterns on gut m
 
 <img width="625" height="489" alt="weaning_barplot_030725" src="https://github.com/user-attachments/assets/5c2425f0-6e8c-4bd4-bd9c-50c7c343ca09" />
 
+
 **Beta diversity**
 
 Non-metric multidimensional scaling (NMDS) shows separation of the gut microbiome communities based on the weaning period. This suggests that there is a significant difference in the microbial compositon between the two groups of mice. 
