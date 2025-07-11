@@ -32,6 +32,11 @@ rowData(tse)
 dim(rowData(tse))
 assays(tse)
 
+#Convert TSE into a phyloseq object
+MiSeqSop_ps <- convertToPhyloseq(tse)
+MiSeqSop_ps
+saveRDS(MiSeqSop_ps, "output/miseqsop_ps.rds") 
+
 #Remove mock community sample
 tse <- tse[, colnames(tse) != "Mock"]
 tse
@@ -62,6 +67,15 @@ tse
 #Species
 altExp(tse, "Species") <- agglomerateByRank(tse, rank = "Species", na.rm = TRUE)
 tse
+
+#Melt the agglomerated species TSE into a dataframe
+tse_species <- altExp(tse, "Species")
+species_df <- meltSE(tse_species, add_row_data = TRUE, 
+                     add_col_data = TRUE, assay.type = "counts")
+View(species_df)
+
+#Export
+write.csv(species_df, "output/species_df.csv", row.names = FALSE)
 
 ##Visualise the relative abundance of the top genera
 tse_genus <- altExp(tse, "Genus")
@@ -104,4 +118,22 @@ plotReducedDim(tse, "NMDS", color_by = "When")
 saveRDS(tse, "output/tse.rds")
 saveRDS(tse_genus_top, "output/tse_genus_top.rds")
 
-#
+#Exploratory data analysis and QC with PCA
+tse <- readRDS("output/tse.rds")
+
+#Centre-log ratio transformation
+tse <- transformAssay(x = tse, assay.type = "counts", 
+                      method = "clr", pseudocount = TRUE, 
+                      name = "clr")
+tse
+
+#Run PCA
+tse <- runPCA(tse, ncomponents = 10, assay.type = "clr")
+tse
+
+#Plot PCA
+plotReducedDim(tse, "PCA", color_by = "When")
+
+
+
+
