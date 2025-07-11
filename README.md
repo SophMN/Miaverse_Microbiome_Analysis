@@ -16,12 +16,21 @@ The goal of this project is to determine the impact of feeding patterns on gut m
 
 <img width="625" height="489" alt="weaning_barplot_030725" src="https://github.com/user-attachments/assets/5c2425f0-6e8c-4bd4-bd9c-50c7c343ca09" />
 
+Figure 1: Bar plot showing the top 20 genera and their relative abundance by weaning period.  
+
+**Exploratory data analysis and quality control with PCA**
+
+PCA revealed distinct clustering of microbial communities. Therefore, the weaning period could account for significant variation in microbial composition and this warrants further investigation. 
+
+<img width="611" height="489" alt="pca_plot" src="https://github.com/user-attachments/assets/85d1645d-1696-4311-be13-d8ba28bd3da2" />
+
+Fig. 2: PCA plot showing separation of microbial communities based on weaning period.
 
 **Beta diversity**
 
-Non-metric multidimensional scaling (NMDS) shows separation of the gut microbiome communities based on the weaning period. This suggests that there is a significant difference in the microbial compositon between the two groups of mice. 
+Non-metric multidimensional scaling (NMDS) showed separation of the gut microbiome communities based on the weaning period. This suggests that there is a significant difference in the microbial compositon between the two groups of mice. 
 
 <img width="625" height="489" alt="NMDS_plot" src="https://github.com/user-attachments/assets/cd78c00e-a8f2-495b-9be8-121052671ccc" />
 
-
+Fig. 3: NMDS plot showing separation of microbial communities by weaning period.
 
