@@ -16,7 +16,7 @@ The goal of this project is to determine the impact of feeding patterns on gut m
 
 <img width="625" height="489" alt="weaning_barplot_030725" src="https://github.com/user-attachments/assets/5c2425f0-6e8c-4bd4-bd9c-50c7c343ca09" />
 
-Figure 1: Bar plot showing the top 20 genera and their relative abundance by weaning period.  
+Figure 1: Bar plot showing the top 20 genera and their relative abundance in decreasing order by weaning period.  
 
 **Exploratory data analysis and quality control with PCA**
 
