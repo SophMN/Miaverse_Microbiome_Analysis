@@ -20,7 +20,7 @@ Figure 1: Bar plot showing the top 20 genera and their relative abundance in dec
 
 **Exploratory data analysis and quality control with PCA**
 
-PCA revealed distinct clustering of microbial communities. Therefore, the weaning period could account for significant variation in microbial composition and this warrants further investigation. 
+PCA revealed distinct clustering of microbial communities. Therefore, the weaning period could account for significant variation in microbial composition, warranting further investigation. 
 
 <img width="611" height="489" alt="pca_plot" src="https://github.com/user-attachments/assets/85d1645d-1696-4311-be13-d8ba28bd3da2" />
 
