@@ -3,6 +3,9 @@ library(mia)
 library(miaViz)
 library(patchwork)
 library(scater)
+library(knitr)
+library(ggplot2)
+library(microbiomeDataSets)
 
 #Import data
 samdf <- read.csv("data/samdf.csv")
@@ -134,6 +137,118 @@ tse
 #Plot PCA
 plotReducedDim(tse, "PCA", color_by = "When")
 
+##Taxonomic information
+#Accessing taxonomic information
+checkTaxonomy(tse)
+
+#Check the taxonomy ranks in rowData
+taxonomyRanks(tse)
+
+#Subset rowData to the needed columns
+rowData(tse)[, taxonomyRanks(tse)]
+
+#Check for empty values in a selected taxonomy rank
+all(!taxonomyRankEmpty(tse, rank = "Kingdom"))
+all(!taxonomyRankEmpty(tse, rank = "Genus"))
+all(!taxonomyRankEmpty(tse, rank = "Species"))
+table(taxonomyRankEmpty(tse, rank = "Genus"))
+table(taxonomyRankEmpty(tse, rank = "Species"))
+
+#Get taxonomy labels
+getTaxonomyLabels(tse) |> head()
+
+#Get information on certain taxa
+getUnique(tse, rank = "Phylum")
+getUnique(tse, rank = "Genus") |> head()
+getUnique(tse, rank = "Species") |> head()
+
+#Get information that matches a specific taxa
+mapTaxonomy(tse, taxa = "Lactobacillus")
+mapTaxonomy(tse, taxa = "Helicobacter")
+
+##Data wrangling
+#Split the data based on a specific variable
+tse_genus <- altExp(tse, "Genus")
+tse_list <- splitOn(tse_genus, group = "When")
+tse_list
+
+#Get the top genera in the dataset
+top_taxa <- sapply(tse_list, getTop)
+top_taxa
+top_taxa |> kable()
+
+###Exercise
+#Load data
+data("GlobalPatterns", package = "mia")
+tse2 <- GlobalPatterns
+tse2
+saveRDS(tse2, "output/tse2.rds")
+
+#Explore the sample metadata
+colData(tse2)
+
+#Add arbitrary groups to colData
+colData(tse2)$Group <- sample(c("group1", "group2"), size = ncol(tse2), replace = TRUE)
+colData(tse2)
+
+##Explore the group distribution with a barplot
+#First melt the TSE into a data frame for easier plotting with ggplot
+metadata <- meltSE(tse2, assay.type = "counts", add_row_data = TRUE, 
+                     add_col_data = TRUE, row.names = FALSE)
+#Plot
+ggplot(metadata, aes(x = Group, fill = Group)) +
+  geom_bar(color = "black") +
+  theme_bw()
+
+#Split the data based on groups
+tse2_group <- splitOn(tse2, group = "Group")
+tse2_group
+
+#Merge the dataset you're working on with another one
+tse3 <- mergeSEs(list(tse, tse2), join = "inner")
+tse3
+
+###Data exploration and quality control with baboon gut microbiome data
+#Summarise data
+tse_baboon <- baboongut()
+tse_baboon
+
+#Calculate summary tables to examine the variance in library sizes
+summary(tse_baboon, assay.type = "counts")
+
+#Evaluate the absolute and relative abundance of each taxon at the genus level
+df <- summarizeDominance(tse_baboon, rank = "Genus")
+df
+
+#Get unique taxa 
+getUnique(tse_baboon, rank = "Phylum")
+
+#Get the top 10 taxa
+top_features <- getTop(tse_baboon, method = "median", top = 10)
+top_features
+
+#Get the prevalent taxa: retrieves taxa which exceed the specified prevalence and detection thresholds
+prev <- getPrevalent(tse_baboon, rank = "Genus", prevalence = 0.2, detection = 0)
+prev |> head()
+
+#Get the rare taxa
+rare <- getRare(tse_baboon, rank = "Genus", prevalence = 0.2, detection = 0)
+rare |> head()
+
+##Library size
+#Calculate and add total counts to colData
+tse_baboon <- addPerCellQC(tse_baboon)
+colData(tse_baboon)
+
+#Visualise the lib sizes with a violin plot and histogram
+plot1 <- plotColData(tse_baboon, x = "sex", y = "total", colour_by = "age")
+plot2 <- plotHistogram(tse_baboon, col.var = "total")
+plot1+plot2
 
 
+##Contamination
+colData(tse_baboon) |> head() |> kable()
 
+#Detect contaminants with the frequency-based method
+tse_baboon <- addContaminantQC(tse_baboon, concentration = "post_pcr_dna_ng")
+rowData(tse) |> head()
