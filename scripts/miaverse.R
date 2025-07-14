@@ -252,3 +252,4 @@ colData(tse_baboon) |> head() |> kable()
 #Detect contaminants with the frequency-based method
 tse_baboon <- addContaminantQC(tse_baboon, concentration = "post_pcr_dna_ng")
 rowData(tse) |> head()
+saveRDS(tse_baboon, "output/tse_baboon.rds")
