@@ -290,7 +290,17 @@ plotExpression(tse_baboon, features = top, x = "sex",
                assay.type = "relabundance", point_alpha = 0.01) +
   scale_y_log10()
 
+##Evaluate prevalence at a threshold of 0.1%
+#Add prevalence
+tse_baboon <- addPrevalence(tse_baboon, detection = 0.1/100, as.relative = TRUE)
 
+#Plot histogram 
+plotHistogram(tse_baboon, row.var = "prevalence")
+
+#Plot heatmap
+plotRowPrevalence(tse_baboon, as.relative = TRUE) +
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank())
 
 
 
