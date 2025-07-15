@@ -267,3 +267,30 @@ summary(colData(tse_baboon)$asv_richness)
 
 #Evaluating distribution of categorical variables in colData
 plotBarplot(tse_baboon, col.var = "sex")
+
+#Evaluating abundance
+#Transform the counts into relative abundance
+tse_baboon <- transformAssay(tse_baboon, method = "relabundance")
+assays(tse_baboon)
+
+#Plot relative abundance
+#Jitter plot
+plotAbundanceDensity(tse_baboon, layout = "jitter", assay.type = "relabundance", 
+                     n = 40, point.size = 1, point.shape = 19, point.alpha = 0.1) +
+  scale_x_log10(label = scales::percent)
+
+#Density plot of the top 5 taxa by sex
+plotAbundanceDensity(tse_baboon, layout = "density", assay.type = "relabundance", 
+                     n = 5, colour.by = "sex", point.alpha = 0.1) +
+  scale_x_log10()
+
+#Violin plot
+top <- getTop(tse_baboon, top = 10L, method = "mean")
+plotExpression(tse_baboon, features = top, x = "sex", 
+               assay.type = "relabundance", point_alpha = 0.01) +
+  scale_y_log10()
+
+
+
+
+
