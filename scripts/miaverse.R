@@ -12,6 +12,7 @@ samdf <- read.csv("data/samdf.csv")
 seqtab.nochim <- readRDS("output/seqtab.rds")
 taxa <- readRDS("output/taxa.rds")
 tse <- readRDS("output/tse.rds")
+tse_baboon <- readRDS("output/tse_baboon.rds")
 
 ###Creating a TreeSummarisedExperiment object
 #Transpose the ASV count table
@@ -253,3 +254,16 @@ colData(tse_baboon) |> head() |> kable()
 tse_baboon <- addContaminantQC(tse_baboon, concentration = "post_pcr_dna_ng")
 rowData(tse) |> head()
 saveRDS(tse_baboon, "output/tse_baboon.rds")
+
+#Evaluating distribution of microbiome count data 
+plotHistogram(tse_baboon, assay.type = "counts")
+
+#Evaluating the distribution of continuous variables in colData
+colData(tse_baboon)
+plotHistogram(tse_baboon, col.var = "age")
+summary(colData(tse_baboon)$age)
+plotHistogram(tse_baboon, col.var = "asv_richness")
+summary(colData(tse_baboon)$asv_richness)
+
+#Evaluating distribution of categorical variables in colData
+plotBarplot(tse_baboon, col.var = "sex")
