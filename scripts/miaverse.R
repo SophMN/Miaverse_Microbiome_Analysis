@@ -296,11 +296,19 @@ tse_baboon <- addPrevalence(tse_baboon, detection = 0.1/100, as.relative = TRUE)
 
 #Plot histogram 
 plotHistogram(tse_baboon, row.var = "prevalence")
+rowData(tse_baboon)
 
 #Plot heatmap
 plotRowPrevalence(tse_baboon, as.relative = TRUE) +
   theme(axis.text.y = element_blank(), 
         axis.ticks.y = element_blank())
 
+#Relationship between prevalence and abundance
+plotPrevalence(tse_baboon, as.relative = TRUE)
 
+#Calculate the proportion of core taxa
+tse_baboon <- addPrevalentAbundance(tse_baboon, prevalence = 50/100, detection = 0.1/100)
+colData(tse_baboon)
 
+#Visualise
+plotHistogram(tse_baboon, col.var = "prevalent_abundance")
