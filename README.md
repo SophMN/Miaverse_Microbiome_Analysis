@@ -8,11 +8,11 @@ Miaverse is a modern Bioconductor package used for the analysis of amplicon sequ
 
 **Goal**
 
-The goal of this project is to determine the impact of feeding patterns on gut microbiome composition in mice using the Miaverse tool. The aim of this learning journey is to enhance my skills in microbiome data science including: machine learning, data manipulation and visualisation.
+The aim of this learning journey is to enhance my skills in microbiome data science including: machine learning, data manipulation and visualisation.
 
 **Results**
 
-**Gut microbiome composition and relative abundance by weaning period**
+**Gut microbiome composition and relative abundance in mice by weaning period**
 
 <img width="625" height="489" alt="weaning_barplot_030725" src="https://github.com/user-attachments/assets/5c2425f0-6e8c-4bd4-bd9c-50c7c343ca09" />
 
