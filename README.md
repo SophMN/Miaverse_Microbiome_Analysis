@@ -12,7 +12,7 @@ The aim of this learning journey is to enhance my skills in microbiome data scie
 
 **Results**
 
-**Gut microbiome composition and relative abundance by weaning period**
+**Gut microbiome composition and relative abundance in mice by weaning period**
 
 <img width="625" height="489" alt="weaning_barplot_030725" src="https://github.com/user-attachments/assets/5c2425f0-6e8c-4bd4-bd9c-50c7c343ca09" />
 
