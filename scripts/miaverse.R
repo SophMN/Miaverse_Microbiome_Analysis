@@ -312,3 +312,51 @@ colData(tse_baboon)
 
 #Visualise
 plotHistogram(tse_baboon, col.var = "prevalent_abundance")
+saveRDS(tse_baboon, "output/tse_baboon.rds")
+
+###Exercise: QC and data exploration
+#Load mouse gut data
+tse <- readRDS("output/tse.rds")
+tse
+
+#Summarise the counts with a histogram and violin plot
+summary(tse, assay.type = "counts")
+plotHistogram(tse, assay.type = "counts")
+
+#Add library sizes and visualise the library size distribution with a histogram
+tse <- addPerCellQC(tse)
+colData(tse)
+plotHistogram(tse, col.var = "total") #The sampling depth differs 
+plotColData(tse, x = "When", y = "total", colour_by = "Day")
+
+#Add prevalence of the taxa to rowData
+tse <- addPrevalence(tse, detection = 0.1/100, as.relative = TRUE)
+rowData(tse)
+
+#Visualise prevalence distribution with a histogram
+plotHistogram(tse, row.var = "prevalence") #The data includes a few prevalent taxa
+
+#Visualise categorical variables in colData with a barplot
+plotBarplot(tse, col.var = "When")
+
+#Get the available taxonomy ranks in the data
+taxonomyRanks(tse)
+
+#Calculate a table that summarises the dominance of genera
+df <- summarizeDominance(tse, rank = "Genus")
+View(df)
+
+#Get the most prevalent features in a specific taxonomic rank using the counts table
+#Set prevalence to 20% and detection threshold to 1
+prev <- getPrevalent(tse, assay.type = "counts", rank = "Genus", 
+                     prevalence = 0.2, detection = 1)
+prev |> head()
+
+#Get the most abundant features by median abundance
+top_taxa <- getTop(tse, rank = "Genus", method = "median", top = 10)
+rowData(tse)
+
+#Visualise the prevalent features
+plotRowPrevalence(tse, as.relative = TRUE) +
+  theme(axis.text.y = element_blank(), 
+        axis.ticks.y = element_blank())
