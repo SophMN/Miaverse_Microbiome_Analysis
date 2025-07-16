@@ -446,3 +446,92 @@ dim(tse_sub)
 #Subset data based on prevalent features, setting the detection threshold at 1 and prevalence threshold at 20%
 tse_prevalent <- subsetByPrevalent(tse, assay.type = "counts", 
                                    rank = "Genus", prevalence = 0.2, detection = 1)
+
+##Agglomeration with the GlobalPatterns dataset
+tse2_phylum <- agglomerateByRank(tse2, rank = "Phylum", update.tree = TRUE)
+tse2_phylum
+rowData(tse2_phylum)
+rowTree(tse2_phylum)
+assay(tse2_phylum, "counts") |> head()
+
+#Check the abundances of specific phyla
+phyla <- c("Actinobacteria", "Chlamydiae")
+
+#Subset by feature
+tse2_phyla <- tse2_phylum[phyla, ]
+assay(tse2_phyla)
+
+#Store the agglomerated data as an alternative experiment
+altExp(tse2, "phylum") <- tse2_phylum
+altExpNames(tse2)
+
+#Agglomerate taxonomic information across all ranks
+tse2 <- agglomerateByRanks(tse2)
+altExpNames(tse2)
+
+#Aggregate data by a specific variable
+tse2_sub <- agglomerateByVariable(tse2, by = "cols", group = "SampleType")
+tse2_sub
+
+#Agglomerate by prevalence
+#Transform count data into relative abundances
+tse2 <- transformAssay(tse2, method = "relabundance")
+tse2_prev <- agglomerateByPrevalence(tse2, assay.type = "relabundance", 
+                                     prevalence = 20/100, detection = 0.1/100)
+tse2_prev
+
+#Agglomerate features by prevalence as specific taxonomic rank
+tse2_prev_phylum <- agglomerateByPrevalence(tse2, rank = "Phylum", 
+                                            prevalence = 20/100, detection = 1)
+tse2_prev_phylum
+saveRDS(tse2, "output/tse2.rds")
+
+###Exercise using mouse gut data
+#Load data
+tse <- readRDS("output/tse.rds")
+tse
+
+#List the available taxonomic ranks
+taxonomyRanks(tse)
+
+#Select a taxonomic rank and list all the unique values in this rank
+getUnique(tse, rank = "Phylum")
+
+#Agglomerate data to the rank and save the data to a new variable
+tse_phylum <- agglomerateByRank(tse, rank = "Phylum")
+
+#How many rows are there in the agglomerated data and do they correspond to the unique values
+dim(tse_phylum) #There are 9 rows and they correspond to the unique values above
+
+#Observe the rowData of the agglomerated data
+rowData(tse_phylum) |> head()
+
+#Agglomerate the data to all taxonomic ranks at once
+tse <- agglomerateByRanks(tse)
+altExpNames(tse)
+
+#Select a single alternative experiment and retrieve the agglomerated data from the altExp slots.
+tse_family <- altExp(tse, "Family")
+
+#How many rows and columns are there?
+dim(tse_family) #32 rows and 19 columns
+
+#Agglomerate the data based on prevalence and save the agglomerated data to a new variable
+tse_prev <- agglomerateByPrevalence(tse, assay.type = "relabundance", rank = "Family",  
+                                    prevalence = 20/100, detection = 0.1/100)
+tse_prev
+
+#How does prevalence-agglomeration differ from prevalence-subsetting
+tse_sub_prev <- subsetByPrevalent(tse, rank = "Family", 
+                                  assay.type = "relabundance", 
+                                  prevalence = 0.2, detection = 0.1/100)
+tse_sub_prev
+
+#Add prevalence-agglomerated data to altExp slot of TSE
+altExp(tse, "PrevGlom") <- tse_prev
+altExpNames(tse)
+
+#Agglomerate the data based on a specific variable and check how many rows and columns there are
+tse_when <- agglomerateByVariable(tse, by = "cols", group = "When")
+dim(tse_when) #There are 232 rows and 2 columns
+saveRDS(tse, "output/tse.rds")
