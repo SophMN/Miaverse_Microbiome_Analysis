@@ -4,6 +4,7 @@ library(miaViz)
 library(patchwork)
 library(scater)
 library(knitr)
+library(dplyr)
 library(ggplot2)
 library(microbiomeDataSets)
 
@@ -360,3 +361,88 @@ rowData(tse)
 plotRowPrevalence(tse, as.relative = TRUE) +
   theme(axis.text.y = element_blank(), 
         axis.ticks.y = element_blank())
+saveRDS(tse, "output/tse.rds")
+
+##Data subsetting using the GlobalPatterns dataset
+#Load TSE
+tse2 <- readRDS("output/tse2.rds")
+tse2
+dim(tse2)
+
+#Subset by sample: column-wise
+tse2$SampleType |> table() |> kable()
+
+#Subset by sample type
+tse2_sub <- tse2[ , tse2$SampleType %in% c("Feces", "Skin", "Tongue")]
+dim(tse2_sub)
+
+#Subset by feature: row-wise
+rowData(tse2)$Phylum %>%  table %>%  head() %>%  
+  knitr::kable()
+selected <- rowData(tse2)$Phylum %in% c("Actinobacteria", "Chlamydiae") & !is.na(rowData(tse2)$Phylum)
+tse2_sub <- tse2[selected, ]
+dim(tse2_sub)
+
+#Subset by samples and features
+selected_rows <- rowData(tse2)$Phylum %in% c("Actinobacteria", "Chlamydiae") & !is.na(rowData(tse2)$Phylum)
+selected_cols <- tse2$SampleType %in% c("Feces", "Skin", "Tongue")
+tse2_sub <- tse2[selected_rows, selected_cols]
+dim(tse2_sub)
+
+#Filtering based on library size
+ind <- rowData(tse2)$Species == "Achromatiumoxaliferum"
+ind[is.na(ind)] <- FALSE
+tse2_sub <- tse2[ind, ]
+tse2_sub
+
+#Calculate the number of counts in each sample
+tse2_sub <- addPerCellQCMetrics(tse2_sub)
+colData(tse2_sub)
+tse2_sub$total |> head()
+
+#Remove samples that do not contain bacteria
+tse2_sub <- tse2_sub[ , tse2_sub$total != 0]
+tse2_sub
+
+#Filtering out zero-variance features
+#Calculate the standard deviation
+rowData(tse2)[["sd"]] <- rowSds(assay(tse2, "counts"))
+rowData(tse2)
+
+#Plot histogram to visualise the variance
+hist(log(rowData(tse2)[["sd"]]))
+
+#Removing invariant features
+th <- 1 #Threshold for filtering out invariant features
+selected <- rowData(tse2)[["sd"]] > 1
+tse2_sub <- tse2[selected, ]
+tse2_sub
+
+#Subsetting by prevalence
+#Subset prevalent features
+tse_prev <- subsetByPrevalent(tse2, rank = "Genus", prevalence = 0.1, detection = 1)
+tse_prev
+
+#Subset rare features
+tse_rare <- subsetByRare(tse2, rank = "Genus", prevalence = 0.1, detection = 1)
+tse_rare
+
+###Exercise on subsetting using mouse gut data
+#Load data
+tse <- readRDS("output/tse.rds")
+
+#Calculate library size and add them to colData
+tse <- addPerCellQCMetrics(tse)
+colData(tse)
+
+#Visualise the library sizes with a histogram
+plotHistogram(tse, col.var = "total")
+
+#Select samples that exceed a specific library size threshold based on the histogram
+th <- 5000
+tse_sub <- tse[ , tse$total > 5000]
+dim(tse_sub)
+
+#Subset data based on prevalent features, setting the detection threshold at 1 and prevalence threshold at 20%
+tse_prevalent <- subsetByPrevalent(tse, assay.type = "counts", 
+                                   rank = "Genus", prevalence = 0.2, detection = 1)
