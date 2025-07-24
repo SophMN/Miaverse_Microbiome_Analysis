@@ -535,3 +535,31 @@ altExpNames(tse)
 tse_when <- agglomerateByVariable(tse, by = "cols", group = "When")
 dim(tse_when) #There are 232 rows and 2 columns
 saveRDS(tse, "output/tse.rds")
+
+##Data transformation
+#Load data
+data("Tengeler2020")
+tse <- Tengeler2020
+tse
+
+#Transform counts into relative abundance
+tse <- transformAssay(tse, assay.type = "counts", method = "relabundance")
+
+#Get the values of the transformed assay
+assay(tse, "relabundance") |> head()
+
+#Presence/absence transformation
+tse <- transformAssay(tse, method = "pa")
+assays(tse)
+assay(tse, "pa") |> head()
+
+#CLR transformation
+tse <- transformAssay(x = tse, assay.type = "counts", method = "clr", 
+                      pseudocount = TRUE, name = "clr")
+assays(tse)
+
+##Exercise
+#Load available dataset
+availableDataSets()
+
+
