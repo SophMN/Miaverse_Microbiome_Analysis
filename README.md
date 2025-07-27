@@ -16,7 +16,13 @@ The aim of this learning journey is to enhance my skills in microbiome data scie
 
 <img width="625" height="489" alt="weaning_barplot_030725" src="https://github.com/user-attachments/assets/5c2425f0-6e8c-4bd4-bd9c-50c7c343ca09" />
 
-Figure 1: Bar plot showing the top 20 genera and their relative abundance in decreasing order by weaning period.  
+Figure 1: Bar plot showing the top 20 genera and their relative abundance in decreasing order by weaning period.
+
+**Gut microbiome composition and relative abundance in baboons by season**
+
+<img width="622" height="489" alt="baboon_season_barplot" src="https://github.com/user-attachments/assets/2955b1d5-d6d0-4b73-abd4-06a6d2aac0fe" />
+
+Fig. 2: Barplot showing phyla and their corresponding relative abundance in decreasing order by the season. 
 
 **Exploratory data analysis and quality control with PCA**
 
@@ -24,7 +30,7 @@ PCA revealed distinct clustering of microbial communities. Therefore, the weanin
 
 <img width="611" height="489" alt="pca_plot" src="https://github.com/user-attachments/assets/85d1645d-1696-4311-be13-d8ba28bd3da2" />
 
-Fig. 2: PCA plot showing separation of microbial communities based on weaning period.
+Fig. 3: PCA plot showing separation of microbial communities based on weaning period.
 
 **Beta diversity**
 
@@ -32,5 +38,5 @@ Non-metric multidimensional scaling (NMDS) showed separation of the gut microbio
 
 <img width="625" height="489" alt="NMDS_plot" src="https://github.com/user-attachments/assets/cd78c00e-a8f2-495b-9be8-121052671ccc" />
 
-Fig. 3: NMDS plot showing separation of microbial communities by weaning period.
+Fig. 4: NMDS plot showing separation of microbial communities by weaning period.
 
