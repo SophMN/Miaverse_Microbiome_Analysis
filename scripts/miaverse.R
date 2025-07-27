@@ -559,7 +559,32 @@ tse <- transformAssay(x = tse, assay.type = "counts", method = "clr",
 assays(tse)
 
 ##Exercise
-#Load available dataset
-availableDataSets()
+#Load baboon dataset
+tse_baboon <- readRDS("output/tse_baboon.rds")
+tse_baboon
+assays(tse_baboon)
 
+#Visualise the counts with a histogram and describe the data distribution
+plotHistogram(tse_baboon, assay.type = "counts") #The data is zero-inflated, a common characteristic of microbiome data
 
+#Perform a CLR transformation on the count data with a pseudocount of 1 and add this to the TreeSE as a new assay
+tse_baboon <- transformAssay(tse_baboon, assay.type = "counts", method = "clr",
+                             pseudocount = 1, name = "clr")
+assays(tse_baboon)
+
+#List the available assays by name
+assayNames(tse_baboon)
+
+#Visualise the CLR-transformed data with a histogram and compare the distribution with that of the raw counts data 
+plotHistogram(tse_baboon, assay.type = "clr") #Majority of the values lie below 0 and the data is distributed 
+plotHistogram(tse_baboon, assay.type = "relabundance") #The data distribution looks similar to that of the raw counts' distribution
+
+#Access the CLR-transformed data and store it as a variable
+tse_clr <- assay(tse_baboon, assay.type = "clr")
+tse_clr
+tse_sub <- tse_clr[100, 10]
+
+#Agglomerate the data with agglomerateByRanks then transform the data with altExp = altExpNames(tse)
+tse_baboon <- agglomerateByRanks(tse_baboon)
+altExpNames(tse_baboon)
+altExp <- altExpNames(tse_baboon)
