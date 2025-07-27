@@ -588,3 +588,12 @@ tse_sub <- tse_clr[100, 10]
 tse_baboon <- agglomerateByRanks(tse_baboon)
 altExpNames(tse_baboon)
 altExp <- altExpNames(tse_baboon)
+
+###Community Composition Exercise with baboon gut data
+#Visualise the relative abundances with a barplot, which taxa are the most prevalent
+colData(tse_baboon)
+tse_phylum <- altExp(tse_baboon, "Phylum")
+plotAbundance(tse_phylum, assay.type = "relabundance", 
+             order.row.by = "abund", col.var = "season", facet.cols = TRUE, scales = "free_x")
+
+
