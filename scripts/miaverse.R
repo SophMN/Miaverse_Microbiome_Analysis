@@ -595,5 +595,164 @@ colData(tse_baboon)
 tse_phylum <- altExp(tse_baboon, "Phylum")
 plotAbundance(tse_phylum, assay.type = "relabundance", 
              order.row.by = "abund", col.var = "season", facet.cols = TRUE, scales = "free_x")
+saveRDS(tse_baboon, "output/tse_baboon.rds")
+
+##Alpha Diversity
+#Load the GlobalPatterns dataset
+tse <- readRDS("output/tse2.rds")
+tse
+
+#Calculate multiple alpha diversity measures
+tse <- addAlpha(tse, assay.type = "counts", index = c("observed", "shannon", "faith"), 
+                detection = 10)
+colData(tse)
+
+#Access the alpha diversity measures
+tse$observed |> head()
+tse$shannon |> head()
+saveRDS(tse, "output/tse2.rds")
+
+#Visualise alpha diversity measures
+plotColData(tse, "observed", "SampleType", colour_by = "Group") +
+  theme(axis.text.x = element_text(angle = 45, hjust =1)) +
+  labs(x = "Sample types", y = "Observed Richness")
+
+#Evaluate the correlation between library size and observed richness
+#Generate total read counts
+tse <- addPerCellQCMetrics(tse)
+colData(tse)
+
+#Make scatter plot
+plotColData(tse, x = "total", y = "observed") +
+  labs(x = "Total read count", y = "Observed richness") +
+  geom_smooth(method = "lm")
+
+#Comparison of various alpha diversity measures
+#Visualise correlation
+plotColData(tse, x = "shannon", y = "faith") +
+  labs(x = "Shannon's index", y = "Faith's phylogenetic diversity") +
+  geom_smooth(method = "lm")
+
+#Correlation test
+cor.test(tse[["shannon"]], tse[["faith"]])
+
+#Visualise the results of multiple alpha diversity measures
+plots <- (lapply(c("shannon", "observed", "faith"), 
+                 plotColData, object = tse, x = "SampleType", 
+                 colour_by = "SampleType"))
+
+#Fine-tune the visual appearance
+plots <- lapply(plots, "+", 
+                theme(axis.text.x = element_blank(), 
+                      axis.ticks.x = element_blank(), 
+                      axis.title.x = element_blank()))
+#Wrap and plot the figures
+wrap_plots(plots, ncol = 1) +
+  plot_layout(guides = "collect")
+
+#Statistical analysis of alpha diversity measures
+pairwise.wilcox.test(tse[["observed"]], tse[["SampleType"]], 
+                     p.adjust.method = "fdr")
+
+#Visualise the results of multiple alpha diversity measures with boxplots
+box_observed <- plotColData(tse, x = "SampleType", y = "observed", 
+                            show_boxplot = TRUE, show_violin = FALSE, 
+                            colour_by = "SampleType") +
+  theme(text = element_text(size = 10), 
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+box_shannon <- plotColData(tse, x = "SampleType", y = "shannon", 
+                           show_boxplot = TRUE, show_violin = FALSE, 
+                           colour_by = "SampleType") +
+  theme(text = element_text(size = 10), 
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+#Plot the figures
+plots2 <- box_observed + box_shannon
+wrap_plots(plots2, ncol = 1) +
+  plot_layout(guides = "collect")
+saveRDS(tse, "output/tse2.rds")
+
+###Alpha diversity exercise
+#Load data
+tse_baboon <- readRDS("output/tse_baboon.rds")
+tse_baboon
+
+#Calculate Shannon diversity index and add the results to colData
+tse_baboon <- addAlpha(tse_baboon, assay.type = "counts", index = "shannon")
+colData(tse_baboon)
+
+#Observe colData especially its column names
+colnames(colData(tse_baboon))
+
+#Summarise the distribution of Shannon diversity indices with a histogram.
+#Is their variance?
+#Using mouse gut dataset
+#Load data
+tse_mouse <- readRDS("output/tse.rds")
+tse_mouse
+
+#Calculate alpha diversity metrics
+tse_mouse <- addAlpha(tse_mouse, assay.type = "counts", 
+                      index = c("observed", "shannon"))
+colData(tse_mouse)
+tse_mouse$observed |> head()
+tse_mouse$shannon |> head()
+assay(tse_mouse, "counts") |> head()
+
+#Plot histogram
+plotHistogram(tse_mouse, col.var = "shannon")
+plotHistogram(tse_mouse, col.var = "total")
+##Yes, there is variance in Shannon diversity.
+
+#Relationship between total read count and observed richness
+plotColData(tse_mouse, x = "total", y = "observed") +
+  labs(x = "Total read count", y = "Observed richness") +
+  geom_smooth(method = "lm")
+##There is a positive correlation between total read count and observed richness.
+##This may introduce bias in the statistical analysis of alpha diversity metrics
+##due to uneven sampling depth.
+##Therefore, we need to rarefy the raw count data to adjust for this.
+
+#Calculate Shannon diversity index with rarefaction and store it to colData as "shannon_rarefaction"
+#Summarise the library sizes
+min(tse_mouse$total)
+
+#Rarefy the count data
+tse_mouse <- rarefyAssay(tse_mouse, assay.type = "counts",
+                        sample = min(tse_mouse$total),
+                        replace = FALSE, name = "subsampled")
+assayNames(tse_mouse)
+assay(tse_mouse, "counts") |> head()
+assay(tse_mouse, "subsampled") |> head()
+
+#Calculate Shannon diversity index using the rarefied assay
+tse_mouse <- addAlpha(tse_mouse, assay.type = "subsampled", index = "shannon", 
+                       name = "shannon_rarefaction")
+colData(tse_mouse)
+tse_mouse$shannon |> head()
+tse_mouse$shannon_rarefaction |> head()
+
+#Calculate the correlation between the Shannon indices
+saveRDS(tse_mouse, "output/tse.rds")
+cor.test(tse_mouse[["shannon"]], tse_mouse[["shannon_rarefaction"]])
+##p-value: < 2.2e-16
+
+#Visualise the correlation 
+plotColData(tse_mouse, x = "shannon", y = "shannon_rarefaction") +
+  labs(x = "Shannon index unrarefied", y = "Shannon index rarefied") +
+  geom_smooth(method = "lm")
+
+#Visualise a single diversity index with respect to some sample variable. Is there a difference between the groups?
+plotColData(tse_mouse, x = "When", y = "shannon_rarefaction", colour_by = "When")
+plotColData(tse_mouse, x = "When", y = "shannon_rarefaction", colour_by = "When", 
+            show_boxplot = TRUE, show_violin = FALSE)
+##There is a slight difference in alpha diversity between the 2 groups based on the weaning period.
+
+#Calculate the statistical signficance of the difference in alpha diversity between the groups
+pairwise.wilcox.test(tse_mouse[["shannon_rarefaction"]], tse_mouse[["When"]], 
+                     p.adjust.method = "fdr")
+##p-value: 0.24, indicating that there is no significant difference
+##in alpha diversity between early and late weaning periods.
 
 
