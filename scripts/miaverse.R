@@ -758,4 +758,110 @@ pairwise.wilcox.test(tse_mouse[["shannon_rarefaction"]], tse_mouse[["When"]],
 ##p-value: 0.24, indicating that there is no significant difference
 ##in alpha diversity between early and late weaning periods.
 
+#Community similarity: beta diversity 
+#Load GlobalPatterns dataset
+tse <- readRDS("output/tse2.rds")
+assayNames(tse)
 
+#CLR transformation
+tse <- transformAssay(tse, assay.type = "counts", method = "clr", 
+                      pseudocount = TRUE, name = "clr")
+assayNames(tse)
+
+#Add group info
+tse$Group <- tse$SampleType == "Feces"
+
+#PERMANOVA
+res <- getPERMANOVA(tse, assay.type = "relabundance", formula = x ~ SampleType)
+res
+
+#Unsupervised ordination: PCoA(MDS and NMDS)
+tse <- runMDS(tse, FUN = getDissimilarity, method = "bray", 
+              assay.type = "relabundance", name = "MDS")
+reducedDimNames(tse)
+tse <- runNMDS(tse, FUN = getDissimilarity, method = "bray", 
+               assay.type = "relabundance", name = "NMDS")
+
+#Generate PCoA plot
+p <- plotReducedDim(tse, "MDS", colour_by = "Group")
+
+#Calculate the explained variance
+e <- attr(reducedDim(tse, "MDS"), "eig")
+rel_eig <- e / sum(e[e > 0])
+
+#Add explained variance on each axis
+p <- p + labs(
+  x = paste("PCoA 1 (", round(100 * rel_eig[[1]], 1), "%", ")", sep = ""), 
+  y = paste("PCoA 2 (", round(100 * rel_eig[[2]], 1), "%", ")", sep = "")
+)
+p
+
+#Visualise MDS and NMDS together on one plot
+plot <- lapply(c("MDS", "NMDS"), 
+               plotReducedDim, object = tse, colour_by = "Group")
+wrap_plots(plot) +
+  plot_layout(guide = "collect")
+
+
+#Plot PCA
+tse <- runPCA(tse, assay.type = "counts", ncomponents = 10, name = "PCA")
+reducedDimNames(tse)
+plotReducedDim(tse, "PCA", colour_by = "Group")
+
+#Plot UMAP
+tse <- runUMAP(tse, assay.type = "counts", ncomponents = 3, name = "UMAP")
+reducedDimNames(tse)
+plotReducedDim(tse, "UMAP", colour_by = "Group", ncomponents = c(1:3))
+
+#Explained variance
+#For non-Euclidean dissimilarities, PCoA typically has to cast dissimilarities
+#into similarities in a Euclidean space
+#then projects them onto the maximal variance axis.
+#Making the explained variance for PCoA unreliable
+
+##Quantify dissimilarities in the original feature space
+d0 <- as.matrix(getDissimilarity(t(assay(tse, "relabundance")), "bray"))
+
+##Quantify dissimilarities in the ordination space
+dp <- as.matrix(dist(reducedDim(tse, "MDS")))
+
+##Calculate the relative stress
+stress <- sum((dp-d0)^2) / sum(d0^2)
+stress
+##Relative stress = 0.35
+
+saveRDS(tse, "output/tse2.rds")
+
+#Supervised ordination with dbRDA
+#Load enterotype data
+data("enterotype", package = "mia")
+tse2 <- enterotype
+
+#Relative abundance transformation
+tse2 <- transformAssay(tse2, assay.type = "counts", method = "relabundance")
+assayNames(tse2)
+
+#Perform RDA
+tse2 <- addRDA(tse2, assay.type = "relabundance", 
+               formula = assay ~ ClinicalStatus + Gender + Age, 
+               distance = "bray", na.action = na.exclude)
+reducedDimNames(tse2)
+
+#Store results of PERMANOVA test
+rda_info <- attr(reducedDim(tse2, "RDA"), "significance")
+rda_info
+
+rda_info$permanova |>
+  knitr::kable()
+
+##Age significantly describes the differences between the microbial profiles
+
+#Plot RDA
+plotReducedDim(tse2, "RDA", colour_by = "ClinicalStatus")
+
+#Visualise the model coefficients/loadings for species that show the largest differences between groups
+plotLoadings(tse2, "RDA", ncomponents = 2, n = 20)
+
+#Check for homogeneity
+rda_info$homogeneity |> 
+  knitr::kable()
