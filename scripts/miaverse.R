@@ -737,6 +737,9 @@ tse_mouse$shannon_rarefaction |> head()
 saveRDS(tse_mouse, "output/tse.rds")
 cor.test(tse_mouse[["shannon"]], tse_mouse[["shannon_rarefaction"]])
 ##p-value: < 2.2e-16
+##This indicates that there the raw  and rarefied Shannon diversity indices are similar.
+##This could be because this data was obtained from mice
+##which tend to have controlled diets and environments as opposed to what I commonly observe from human microbiome data.
 
 #Visualise the correlation 
 plotColData(tse_mouse, x = "shannon", y = "shannon_rarefaction") +
