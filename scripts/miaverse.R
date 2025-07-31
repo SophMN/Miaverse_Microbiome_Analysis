@@ -865,3 +865,7 @@ plotLoadings(tse2, "RDA", ncomponents = 2, n = 20)
 #Check for homogeneity
 rda_info$homogeneity |> 
   knitr::kable()
+saveRDS(tse2, "output/tse_enterotype.rds")
+
+##Beta diversity exercise
+
