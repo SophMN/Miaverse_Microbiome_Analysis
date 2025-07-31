@@ -14,6 +14,8 @@ The aim of this learning journey is to enhance my skills in microbiome data scie
 
 **Gut microbiome composition and relative abundance in mice by weaning period**
 
+Early: day 0-10, late: day 140-150
+
 <img width="625" height="489" alt="weaning_barplot_030725" src="https://github.com/user-attachments/assets/5c2425f0-6e8c-4bd4-bd9c-50c7c343ca09" />
 
 Figure 1: Bar plot showing the top 20 genera and their relative abundance in decreasing order by weaning period.
