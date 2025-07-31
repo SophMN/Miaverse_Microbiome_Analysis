@@ -40,3 +40,13 @@ Non-metric multidimensional scaling (NMDS) showed separation of the gut microbio
 
 Fig. 4: NMDS plot showing separation of microbial communities by weaning period.
 
+<img width="622" height="489" alt="mds_nmds_gp" src="https://github.com/user-attachments/assets/21fa2600-8680-4cc0-850b-dae799c1bf33" />
+
+Fig. 5: MDS and NMDS plot of the microbial communities associated with the human gut vs environmental microbiome communities from the Global Patterns dataset.
+
+**Prevalence vs relative abundance of mouse gut microbial communities**
+
+<img width="625" height="359" alt="prev_heatmap_mouse" src="https://github.com/user-attachments/assets/e3a35342-4abf-4f79-bf5a-bb454fe738d1" />
+
+Fig. 6: Prevalence vs relative abundance of gut microbial communities in female mice. 
+
