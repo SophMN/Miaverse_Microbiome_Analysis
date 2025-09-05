@@ -868,4 +868,15 @@ rda_info$homogeneity |>
 saveRDS(tse2, "output/tse_enterotype.rds")
 
 ##Beta diversity exercise
+#Load dataset
+tse_enterotype <- readRDS("output/tse_enterotype.rds")
+tse_enterotype
 
+#Perform CLR transformation
+tse_enterotype <- transformAssay(tse_enterotype, assay.type = "counts", 
+                                 method = "clr", pseudocount = 1)
+
+#Reduce dimensionality with PCA
+tse_enterotype <- runPCA(tse_enterotype, assay.type = "counts", 
+                         name = "PCA", ncomponents = 10)
+reducedDimNames(tse_enterotype)
